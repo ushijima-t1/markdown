@@ -1,0 +1,65 @@
+シングルアプリキオスク
+ユーザーがログインしたら自動的に特定のアプリだけが表示され、他操作がで
+きなくなる専用端末モード
+1. Assigned Access(GUI)
+ UWPアプリまたはEdgeを1つだけ全画面で動作
+ Windows11 Pro / Education / Enterprise 等
+
+2. Shell Launcher(Powershell)
+ 任意のアプリ(.exe)を1つだけ全画面で動作
+ Windows11 Education / Enterprise Windows11 Pro×
+
+マルチアプリキオスク(Windows11 Education / Enterprise)
+ユーザーがログインしたらデスクトップみたいな画面(専用UI)が表示され、許
+可されたアプリケーションのみを実⾏できるモード(複数)
+ UWPアプリとEdgeは複数許可可能
+ 任意のアプリの場合はShell Launcher機能を使用
+ スクリプトが複雑化
+
+Assigned Access
+UWPアプリ
+ Microsoft To Do、Microsoft ニュース、Solitaire & Casual Games、Windows
+Security、Windows バックアップ、Xbox、カメラ、クロック、サウンドレコーダー
+はじめに、フィードバックHub、フォト、メディアプレーヤー、天気、電卓、問い
+合わせ等(UWP版としてStore配信されているアプリだと表示)
+
+Microsoft Edge(指定したURLのみを表示)
+デジタル／対話型ディスプレイ(全画面表示)
+パブリックブラウザ
+ページ内リンクは基本的に閲覧可能
+
+Shell Launcher
+設定方法
+1. ユーザ作成(管理者以外)
+2. Shell Launcherを有効化
+ DISM /online /Get-FeatureInfo /FeatureName:ClientEmbeddedShellLauncher
+⇒状態確認
+ 状態: 無効
+ DISM /online /Enable-Feature /FeatureName:Client-EmbeddedShellLauncher /All /NoRestart
+⇒有効化
+ 状態: 有効
+3. スクリプトの作成(PowerShellで貼り付けでも可能)
+ アプリ配置: C:¥kioskApps¥exp¥ExPing.exe(任意の階層)
+ SID取得: ユーザに割り当てられた識別番号
+ 未割当ユーザーはExplorerに固定
+ 割当ユーザだけスクリプトを起動
+ 有効化: Shell Launcherを適用(SetEnabled)
+
+Shell Launcher(V1)
+ スクリプト(参照)
+$Shell="C:¥kioskApps¥exp¥ExPing.exe"
+$ns="root¥standardcimv2¥embedded"
+$cls="WESL_UserSetting"
+$User="kiosk"
+$Sid = (Get-CimInstance Win32_UserAccount -Filter "Name='$User'").SID
+Invoke-CimMethod -Namespace $ns -ClassName $cls -MethodName SetDefaultShell -Arguments
+@{ Shell='explorer.exe'; DefaultAction=0 } | Out-Null
+Invoke-CimMethod -Namespace $ns -ClassName $cls -MethodName SetCustomShell -Arguments
+@{ Shell=$Shell; Sid=$Sid } | Out-Null
+Invoke-CimMethod -Namespace $ns -ClassName $cls -MethodName SetEnabled -Arguments
+@{ Enabled=$true } | Out-Null
+ 確認コマンド
+ Invoke-CimMethod -Namespace $ns -ClassName $cls -MethodName GetDefaultShell
+ Invoke-CimMethod -Namespace $ns -ClassName $cls -MethodName GetCustomShell -Arguments
+@{ Sid=$Sid }
+ Invoke-CimMethod -Namespace $ns -ClassName $cls -MethodName IsEnabled

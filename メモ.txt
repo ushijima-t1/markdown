@@ -1,0 +1,73 @@
+viの全削除
+:%d
+
+★累積バッチ適用/累積バッチがどの対象か確認する方法
+Windows Update Catalog
+https://www.catalog.update.microsoft.com/
+カタログで検索すると21H2等表示される
+対象端末はその世代（例：21H2）を使用している端末となる。
+
+・累積バッチの適用方法
+hostname
+wmic qfe list brief /format:table
+
+(表示例)
+C:\Users\ss-user>wmic qfe list brief /format:table
+Description      FixComments  HotFixID   InstallDate  InstalledBy          InstalledOn  Name  ServicePackInEffect  Status
+Update                        KB5055169               NT AUTHORITY\SYSTEM  6/9/2025                                     
+Security Update               KB5058385               NT AUTHORITY\SYSTEM  6/9/2025                                     
+Security Update               KB5058531               NT AUTHORITY\SYSTEM  6/9/2025    
+
+windows10.0-kb5068787-x64_e69a4a97d6a59b47b8a3a64dd5c6916365a2388e.msuを開く
+
+
+ITデザイン部のバッチ
+https://sekisuihouse-ltd.box.com/s/gkx8dyrpyzkk9ys7wse6ijc3cf0wjfpt
+
+★BIOS/iRMCのファームアップ
+下記にファーム、手順書あり
+https://www.fsastech.com/ja-jp/products/primergy/downloads/bios/
+
+・オンラインアップデート(OS上で実行)⇒基本これ
+・オフライン/リモートアップデート(iRMC経由で実行)
+
+★PowerChute Network Shutdown
+メジャーバージョンアップ時に無償アップデートは提供されない
+例
+v5.0 → v5.1 / v5.2→ 新規購入（課金）が必要
+v5.0.x のような マイナーアップデートは提供されていない（リリースノート上も v5.0 表記のみ）
+既存環境の v5.0 から v5.1 / v5.2 へのアップグレードは不可
+バージョンアップが必要な場合は 新規ライセンス購入が前提
+
+★iNetSec SF / FC
+URL
+https://www.pfu.ricoh.com/inetsec/inetsec-sf/support/
+https://www.pfu.ricoh.com/inetsec/inetsec-fc/support/
+※定期的にパスワード変更される注意
+
+① 事前確認
+マネージャーバージョンの適用を確認
+マネージャーのバックアップを取得
+※更新後のバージョンはReadme.txtに記載あり実施方法は箇条書きで記載あり
+
+② 修正プログラムの準備
+以下の分割ファイルを 同一フォルダに配置：
+INS●WP-02.7z.001
+INS●WP-02.7z.002
+INS●WP-02.7z.003
+注意.exeファイルを起動して解凍されるので3つのファイルと.exeが必要
+
+③（任意）MD5 チェック
+certutil -hashfile "INS0607WP-02.7z.001" MD5
+certutil -hashfile "INS0607WP-02.7z.002" MD5
+certutil -hashfile "INS0607WP-02.7z.003" MD5
+→ 公開されている MD5 値と一致することを確認
+
+④ 修正プログラム適用（マネージャー）
+展開後フォルダ内の pq_update.exe を実行
+画面の指示に従い適用
+完了後、マネージャーバージョンが ●●になっていることを確認
+
+⑤ センサーファームウェア更新
+マネージャーとセンサーの同期時に 自動的にファーム更新 が行われる
+センサーは更新中に一時停止・再起動する
